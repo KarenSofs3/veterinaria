@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,20 +12,85 @@
             --purple-main: purple;
             --bg-soft: #fff0ff;
         }
-        body { background-color: var(--bg-soft); font-family: 'Segoe UI', sans-serif; }
-        .header, .footer, .modal-header { background: var(--purple-main) !important; color: white; }
-        .card { border-radius: 12px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; }
-        .card:hover { transform: translateY(-3px); }
-        .cita-card { border-left: 5px solid var(--purple-main); }
-        .cita-card.terminada { border-left-color: #28a745; }
-        .cita-card.anulada { border-left-color: #dc3545; }
-        .animal-gif { width: 80%; height: 150px; object-fit: contain; border-radius: 8px; align-self: center; margin-top: 10px; }
-        .estado-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
-        .filter-btn.active { background: var(--purple-main); color: white; }
-        .btn-purple { background: var(--purple-main); border: none; color:white; }
-        .btn-purple:hover { background:  var(--purple-main); color: white; }
+
+        body {
+            background-color: var(--bg-soft);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .header,
+        .footer,
+        .modal-header {
+            background: var(--purple-main) !important;
+            color: white;
+        }
+
+        .card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .cita-card {
+            border-left: 5px solid var(--purple-main);
+        }
+
+        .cita-card.terminada {
+            border-left-color: #28a745;
+        }
+
+        .cita-card.anulada {
+            border-left-color: #dc3545;
+        }
+
+        .animal-gif {
+            width: 80%;
+            height: 150px;
+            object-fit: contain;
+            border-radius: 8px;
+            align-self: center;
+            margin-top: 10px;
+        }
+
+        .estado-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .filter-btn.active {
+            background: var(--purple-main);
+            color: white;
+        }
+
+        .btn-purple {
+            background: var(--purple-main);
+            border: none;
+            color: white;
+        }
+
+        .btn-purple:hover {
+            background: var(--purple-main);
+            color: white;
+        }
+
+        #advertencia {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
     </style>
 </head>
+
 <body>
 
     <header class="header py-3 mb-4 shadow-sm">
@@ -52,7 +118,10 @@
     <div class="modal fade" id="modalCita" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header"><h5>Datos de la Cita</h5><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-header">
+                    <h5>Datos de la Cita</h5><button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div id="advertencia"></div>
                 <div class="modal-body">
                     <form id="formCita">
                         <input type="hidden" id="citaId">
@@ -86,7 +155,8 @@
                             </div>
                             <div class="col-md-6 mb-2">
                                 <label class="form-label">Hora</label>
-                                <input class="form-control" type="time" id="horaCita" required></input>
+                                <input class="form-control" type="time" id="horaCita" min="08:00" max="20:00"
+                                    required></input>
                             </div>
                         </div>
                         <div class="mb-2">
@@ -153,12 +223,32 @@
             const select = document.getElementById('horaCita');
             const fecha = document.getElementById('fechaCita').value;
             select.innerHTML = '<option value="">Seleccione hora...</option>';
-            for(let h=8; h<=18; h++) {
-                const horaStr = `${h}:00`;
-                const ocupado = citas.some(c => c.fecha === fecha && c.hora === horaStr && c.id != document.getElementById('citaId').value);
-                if(!ocupado) select.innerHTML += `<option value="${horaStr}">${h}:00 ${h<12?'AM':'PM'}</option>`;
-            }
+
         }
+
+        const hoy = new Date();
+        hoy.setDate(hoy.getDate() + 1);
+        const year = hoy.getFullYear();
+        const month = String(hoy.getMonth() + 1).padStart(2, '0');
+        const day = String(hoy.getDate()).padStart(2, '0');
+
+        const fechaMinima = `${year}-${month}-${day}`;
+
+        document.getElementById("fechaCita").setAttribute("min", fechaMinima);
+
+
+        document.getElementById("horaCita").addEventListener("change", function () {
+            const hora = this.value;
+
+            if (hora < "08:00" || hora > "20:00") {
+                alert("Solo se permiten citas entre 8:00 AM y 8:00 PM");
+                this.value = "";
+            }
+        });
+
+        const mensaje = document.getElementById('advertencia');
+        mensaje.style.display = "none";
+        mensaje.innerHTML = "";
 
         document.getElementById('btnGuardarCita').onclick = () => {
             const id = document.getElementById('citaId').value || Date.now();
@@ -173,19 +263,40 @@
                 estado: document.getElementById('estadoCita').value || 'abierta'
             };
 
-            if(!nueva.nombreMascota || !nueva.hora) return alert("Completa los campos");
+            if (!nueva.nombreMascota) {
+                mensaje.innerHTML = "Es necesario poner el nombre de la mascota";
+                mensaje.style.display = "block";
+                return;
+            } else if (!nueva.fecha) {
+                mensaje.innerHTML = "Es necesario establecer la fecha";
+                mensaje.style.display = "block";
+                return;
+            } else if (!nueva.hora) {
+                mensaje.innerHTML = "Es necesario establecer la hora";
+                mensaje.style.display = "block";
+                return;
+            } else if (!nueva.nombrePropietario) {
+                mensaje.innerHTML = "Es necesario poner el nombre del propietario";
+                mensaje.style.display = "block";
+                return;
+            } else if (!nueva.sintomas) {
+                mensaje.innerHTML = "Es necesario poner los sintomas";
+                mensaje.style.display = "block";
+                return;
+            }
             const index = citas.findIndex(c => c.id == id);
             index > -1 ? citas[index] = nueva : citas.push(nueva);
             localStorage.setItem('citas', JSON.stringify(citas));
             modal.hide();
             render();
+
         };
 
         function render(filtro = 'todas') {
             const contenedor = document.getElementById('listaCitas');
             contenedor.innerHTML = '';
             const filtradas = citas.filter(c => filtro === 'todas' || c.estado === filtro);
-            
+
             filtradas.forEach(c => {
                 contenedor.innerHTML += `
                     <div class="col-md-4">
@@ -231,7 +342,7 @@
         };
 
         window.eliminar = (id) => {
-            if(confirm("¿Estás seguro de eliminar esta cita?")) {
+            if (confirm("¿Estás seguro de eliminar esta cita?")) {
                 citas = citas.filter(c => c.id != id);
                 localStorage.setItem('citas', JSON.stringify(citas));
                 render();
@@ -249,4 +360,5 @@
         render();
     </script>
 </body>
+
 </html>
