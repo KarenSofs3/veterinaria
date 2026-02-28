@@ -92,7 +92,7 @@
 </head>
 
 <body>
-
+    <div id="pantallaeliminar"></div>
     <header class="header py-3 mb-4 shadow-sm">
         <div class="container d-flex justify-content-between align-items-center">
             <h1><i class="bi bi-paw"></i> VET MiauGuau</h1>
@@ -241,8 +241,11 @@
             const hora = this.value;
 
             if (hora < "08:00" || hora > "20:00") {
-                alert("Solo se permiten citas entre 8:00 AM y 8:00 PM");
+                mensaje.innerHTML = "Solo se permiten citas entre 8:00 AM y 8:00 PM";
+                mensaje.style.display = "block";
                 this.value = "";
+                return;
+
             }
         });
 
@@ -342,11 +345,37 @@
         };
 
         window.eliminar = (id) => {
-            if (confirm("¿Estás seguro de eliminar esta cita?")) {
-                citas = citas.filter(c => c.id != id);
-                localStorage.setItem('citas', JSON.stringify(citas));
-                render();
-            }
+            document.getElementById('pantallaeliminar').innerHTML = `
+        <div class="modal show d-block" style="background: rgba(0,0,0,0.5)" tabindex="-1">
+            <div class="modal-dialog modal-sm modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Confirmar</h5>
+                    </div>
+                    <div class="modal-body text-center">
+                        <p>¿Estás seguro de eliminar esta cita?</p>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <!-- Limpia el modal si cancela -->
+                        <button class="btn btn-secondary" onclick="document.getElementById('pantallaeliminar').innerHTML = '';">Cancelar</button>
+                        <!-- Llama a la función global para borrar -->
+                        <button class="btn btn-danger" onclick="ejecutarBorrado(${id})">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        };
+
+        // 2. Creamos la función de borrado afuera para que sea accesible
+        window.ejecutarBorrado = (id) => {
+            citas = citas.filter(c => c.id != id);
+            localStorage.setItem('citas', JSON.stringify(citas));
+
+            // Limpiamos el modal de la pantalla
+            document.getElementById('pantallaeliminar').innerHTML = '';
+
+            // Refrescamos la lista
+            render();
         };
 
         document.querySelectorAll('.filter-btn').forEach(btn => {
