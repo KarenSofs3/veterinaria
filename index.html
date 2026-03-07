@@ -204,6 +204,8 @@
         };
 
         document.getElementById('btnNuevaCita').onclick = () => {
+            mensaje.style.display = "none";
+            mensaje.innerHTML = "";
             document.getElementById('formCita').reset();
             document.getElementById('citaId').value = '';
             document.getElementById('estadoContainer').style.display = 'none';
@@ -332,6 +334,8 @@
         }
 
         window.editar = (id) => {
+            mensaje.style.display = "none";
+            mensaje.innerHTML = "";
             const c = citas.find(cita => cita.id == id);
             document.getElementById('citaId').value = c.id;
             document.getElementById('nombreMascota').value = c.nombreMascota;
