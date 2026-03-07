@@ -210,7 +210,6 @@
             document.getElementById('citaId').value = '';
             document.getElementById('estadoContainer').style.display = 'none';
             document.getElementById('gifPreview').innerHTML = '';
-            generarHoras();
             modal.show();
         };
 
@@ -219,13 +218,7 @@
             document.getElementById('gifPreview').innerHTML = val ? `<img src="${gifs[val]}" class="animal-gif shadow-sm">` : '';
         };
 
-        document.getElementById('fechaCita').onchange = () => generarHoras();
-
-        function generarHoras() {
-            const select = document.getElementById('horaCita');
-            const fecha = document.getElementById('fechaCita').value;
-            select.innerHTML = '<option value="">Seleccione hora...</option>';
-        }
+  
 
 
         document.getElementById("horaCita").addEventListener("change", function () {
@@ -334,8 +327,6 @@
         }
 
         window.editar = (id) => {
-            mensaje.style.display = "none";
-            mensaje.innerHTML = "";
             const c = citas.find(cita => cita.id == id);
             document.getElementById('citaId').value = c.id;
             document.getElementById('nombreMascota').value = c.nombreMascota;
@@ -345,7 +336,6 @@
             document.getElementById('sintomas').value = c.sintomas;
             document.getElementById('estadoCita').value = c.estado;
             document.getElementById('estadoContainer').style.display = 'block';
-            generarHoras();
             document.getElementById('horaCita').value = c.hora;
             document.getElementById('gifPreview').innerHTML = `<img src="${gifs[c.tipoMascota]}" class="animal-gif shadow-sm">`;
             modal.show();
