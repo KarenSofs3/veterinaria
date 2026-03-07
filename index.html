@@ -213,7 +213,7 @@
         };
 
         document.getElementById('tipoMascota').onchange = (e) => {
-            const val = e.target.value;
+            const val = e.target.value
             document.getElementById('gifPreview').innerHTML = val ? `<img src="${gifs[val]}" class="animal-gif shadow-sm">` : '';
         };
 
@@ -223,18 +223,7 @@
             const select = document.getElementById('horaCita');
             const fecha = document.getElementById('fechaCita').value;
             select.innerHTML = '<option value="">Seleccione hora...</option>';
-
         }
-
-        const hoy = new Date();
-        hoy.setDate(hoy.getDate() + 1);
-        const year = hoy.getFullYear();
-        const month = String(hoy.getMonth() + 1).padStart(2, '0');
-        const day = String(hoy.getDate()).padStart(2, '0');
-
-        const fechaMinima = `${year}-${month}-${day}`;
-
-        document.getElementById("fechaCita").setAttribute("min", fechaMinima);
 
 
         document.getElementById("horaCita").addEventListener("change", function () {
@@ -244,7 +233,7 @@
                 mensaje.innerHTML = "Solo se permiten citas entre 8:00 AM y 8:00 PM";
                 mensaje.style.display = "block";
                 this.value = "";
-                return;
+                return;4
 
             }
         });
@@ -255,6 +244,8 @@
 
         document.getElementById('btnGuardarCita').onclick = () => {
             const id = document.getElementById('citaId').value || Date.now();
+            mensaje.style.display = "none";
+            mensaje.innerHTML = "";
             const nueva = {
                 id,
                 nombreMascota: document.getElementById('nombreMascota').value,
@@ -287,6 +278,18 @@
                 mensaje.style.display = "block";
                 return;
             }
+
+            const fechaseleccionada = new Date(nueva.fecha);
+            const manana = new Date();
+            manana.setDate(manana.getDate() + 1);
+            manana.setHours(0, 0, 0, 0);
+
+            if (fechaseleccionada < manana) {
+                mensaje.innerHTML = "La fecha debe ser a partir de mañana";
+                mensaje.style.display = "block";
+                return;
+            }
+
             const index = citas.findIndex(c => c.id == id);
             index > -1 ? citas[index] = nueva : citas.push(nueva);
             localStorage.setItem('citas', JSON.stringify(citas));
